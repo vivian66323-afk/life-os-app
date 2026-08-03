@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Life OS — Capture Stress Test</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .app { max-width: 940px; }
+  .st-head { padding: 4px 4px 0; margin-bottom: 8px; }
+  .st-title { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; }
+  .st-sub { font-size: 14px; color: var(--text-2); margin-top: 6px; max-width: 640px; line-height: 1.5; }
+  .st-base { font-size: 12.5px; color: var(--text-3); margin-top: 10px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; line-height: 1.5; }
+  .st-base b { color: var(--text-2); }
+  .st-verdict { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin: 20px 0 6px; }
+  .vc { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 15px 16px; box-shadow: var(--shadow); }
+  .vc .n { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; }
+  .vc .l { font-size: 12px; color: var(--text-3); margin-top: 3px; }
+  .tbl-wrap { overflow-x: auto; margin-top: 18px; border: 1px solid var(--line); border-radius: 14px; }
+  table { border-collapse: collapse; width: 100%; min-width: 780px; font-size: 12.5px; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; line-height: 1.4; }
+  th { font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); font-weight: 650; background: var(--panel-2); position: sticky; top: 0; }
+  tr:last-child td { border-bottom: none; }
+  td.sc { font-weight: 550; color: var(--text); white-space: nowrap; }
+  .op { font-weight: 650; font-size: 11px; letter-spacing: 0.03em; }
+  .op.y { color: var(--ok); } .op.m { color: var(--warn); } .op.n { color: var(--danger); }
+  td.tm { color: var(--text-2); white-space: nowrap; }
+  td.fr { color: var(--text-2); }
+  td.im { color: var(--text); }
+  .find { margin-top: 26px; }
+  .find h2 { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+  .find ul { margin: 10px 0 0 2px; padding: 0; list-style: none; display: grid; gap: 9px; }
+  .find li { font-size: 13.5px; color: var(--text-2); line-height: 1.5; padding-left: 20px; position: relative; }
+  .find li::before { content: "—"; position: absolute; left: 0; color: var(--text-3); }
+  .find li b { color: var(--text); font-weight: 600; }
+  .pass { margin-top: 22px; background: linear-gradient(160deg, var(--accent-soft), transparent 70%), var(--panel-2); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; font-size: 14px; line-height: 1.55; color: var(--text); }
+  .pass b { font-weight: 650; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand"><span class="mark"></span>Life OS</div>
+    <div class="toolbar">
+      <nav class="levelnav"><a href="index.html">← Hub</a><a href="capture.html">Capture</a></nav>
+      <button class="iconbtn" id="theme" title="Toggle light / dark">☾</button>
+    </div>
+  </div>
+
+  <div class="st-head">
+    <div class="st-title">Capture — Stress Test</div>
+    <div class="st-sub">One question this sprint: <b>can I save a thought faster than Apple Notes?</b> No features added — only speed validated across 32 real situations.</div>
+    <div class="st-base"><b>Baseline judged:</b> unlock → open Life OS → capture field sits at the <b>bottom</b> of the stage → tap to focus → type → Enter. Focus stays for the next line. Apple Notes ≈ open → tap "new note" (or last note) → type.</div>
+  </div>
+
+  <div class="st-verdict">
+    <div class="vc"><div class="n">24</div><div class="l">Would open Capture (Yes)</div></div>
+    <div class="vc"><div class="n">6</div><div class="l">Maybe — hands/target fight it</div></div>
+    <div class="vc"><div class="n">2</div><div class="l">No — eyes + hands fully gone</div></div>
+  </div>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Situation</th><th>Open?</th><th>Time</th><th>Biggest friction</th><th>One improvement</th></tr></thead>
+    <tbody>
+      <tr><td class="sc">Driving</td><td><span class="op n">No</span></td><td class="tm">—</td><td class="fr">Eyes on road, both hands gone</td><td class="im">Text can't win — out of scope (needs voice)</td></tr>
+      <tr><td class="sc">Shower thought</td><td><span class="op n">No</span></td><td class="tm">—</td><td class="fr">Wet, no device in reach</td><td class="im">Out of scope — capture after, fast</td></tr>
+      <tr><td class="sc">Walking outdoors</td><td><span class="op y">Yes</span></td><td class="tm">~6s</td><td class="fr">Field at bottom + tap to focus</td><td class="im">Autofocus field on open</td></tr>
+      <tr><td class="sc">Construction site (gloves)</td><td><span class="op m">Maybe</span></td><td class="tm">~9s</td><td class="fr">Gloves miss the small field</td><td class="im">Bigger tap target, field at top</td></tr>
+      <tr><td class="sc">In a meeting</td><td><span class="op y">Yes</span></td><td class="tm">~5s</td><td class="fr">Tapping bottom field draws eyes down</td><td class="im">Autofocus — one glance, not two</td></tr>
+      <tr><td class="sc">Talking with a client</td><td><span class="op m">Maybe</span></td><td class="tm">~7s</td><td class="fr">Can't break eye contact to aim</td><td class="im">Autofocus + keep focus</td></tr>
+      <tr><td class="sc">Before sleeping (dark)</td><td><span class="op y">Yes</span></td><td class="tm">~6s</td><td class="fr">Must aim at bottom field in the dark</td><td class="im">Autofocus (dark theme already fine)</td></tr>
+      <tr><td class="sc">Reading a book</td><td><span class="op y">Yes</span></td><td class="tm">~5s</td><td class="fr">App switch, then field at bottom</td><td class="im">Autofocus on open</td></tr>
+      <tr><td class="sc">Waiting in line</td><td><span class="op y">Yes</span></td><td class="tm">~5s</td><td class="fr">One hand full (bag/coffee)</td><td class="im">Autofocus + one-hand reach</td></tr>
+      <tr><td class="sc">Cooking (messy hands)</td><td><span class="op m">Maybe</span></td><td class="tm">~8s</td><td class="fr">Wet hands need a precise tap</td><td class="im">Bigger target + autofocus</td></tr>
+      <tr><td class="sc">At the gym</td><td><span class="op m">Maybe</span></td><td class="tm">~7s</td><td class="fr">Sweaty hands, moving</td><td class="im">Autofocus, big target</td></tr>
+      <tr><td class="sc">Grocery shopping</td><td><span class="op y">Yes</span></td><td class="tm">~6s</td><td class="fr">Cart + phone, one hand</td><td class="im">Autofocus, one-hand reach</td></tr>
+      <tr><td class="sc">Coffee shop</td><td><span class="op y">Yes</span></td><td class="tm">~4s</td><td class="fr">Minimal — still one tap to focus</td><td class="im">Autofocus shaves the tap</td></tr>
+      <tr><td class="sc">On a phone call</td><td><span class="op m">Maybe</span></td><td class="tm">~8s</td><td class="fr">Phone at ear, must switch apps</td><td class="im">Text loses — out of scope</td></tr>
+      <tr><td class="sc">Mid group-conversation</td><td><span class="op y">Yes</span></td><td class="tm">~6s</td><td class="fr">Social cost of looking down</td><td class="im">Autofocus = shorter glance</td></tr>
+      <tr><td class="sc">Public transit (standing)</td><td><span class="op y">Yes</span></td><td class="tm">~7s</td><td class="fr">One hand on rail, jolts</td><td class="im">Autofocus + big target</td></tr>
+      <tr><td class="sc">In bed, half-asleep</td><td><span class="op y">Yes</span></td><td class="tm">~6s</td><td class="fr">Fumbling for the bottom field</td><td class="im">Autofocus</td></tr>
+      <tr><td class="sc">Gym set rest</td><td><span class="op y">Yes</span></td><td class="tm">~6s</td><td class="fr">Short window, sweaty</td><td class="im">Autofocus</td></tr>
+      <tr><td class="sc">Parking the car</td><td><span class="op y">Yes</span></td><td class="tm">~6s</td><td class="fr">Want it gone before I forget</td><td class="im">Autofocus + stay-focused</td></tr>
+      <tr><td class="sc">Watching TV</td><td><span class="op y">Yes</span></td><td class="tm">~5s</td><td class="fr">Low urgency, still needs a tap</td><td class="im">Autofocus</td></tr>
+      <tr><td class="sc">Boring lecture</td><td><span class="op y">Yes</span></td><td class="tm">~5s</td><td class="fr">Must stay discreet</td><td class="im">Autofocus</td></tr>
+      <tr><td class="sc">Just woke up</td><td><span class="op y">Yes</span></td><td class="tm">~7s</td><td class="fr">Groggy, aiming at bottom field</td><td class="im">Autofocus</td></tr>
+      <tr><td class="sc">Mid-writing an email</td><td><span class="op y">Yes</span></td><td class="tm">~6s</td><td class="fr">App-switch cost</td><td class="im">Autofocus on return</td></tr>
+      <tr><td class="sc">Kids demanding attention</td><td><span class="op y">Yes</span></td><td class="tm">~5s</td><td class="fr">Split-second, one hand</td><td class="im">Autofocus + stay-focused</td></tr>
+      <tr><td class="sc">Hiking (cold hands)</td><td><span class="op m">Maybe</span></td><td class="tm">~9s</td><td class="fr">Cold fingers miss the target</td><td class="im">Bigger target + autofocus</td></tr>
+      <tr><td class="sc">At a whiteboard</td><td><span class="op y">Yes</span></td><td class="tm">~6s</td><td class="fr">Phone in hand, quick jot</td><td class="im">Autofocus</td></tr>
+      <tr><td class="sc">Getting dressed</td><td><span class="op y">Yes</span></td><td class="tm">~7s</td><td class="fr">One hand, rushed</td><td class="im">Autofocus</td></tr>
+      <tr><td class="sc">Remembering at the register</td><td><span class="op y">Yes</span></td><td class="tm">~7s</td><td class="fr">Split attention while paying</td><td class="im">Autofocus + stay-focused</td></tr>
+      <tr><td class="sc">Bathroom</td><td><span class="op y">Yes</span></td><td class="tm">~5s</td><td class="fr">Private — few blockers</td><td class="im">Autofocus</td></tr>
+      <tr><td class="sc">Falling asleep, lights off</td><td><span class="op y">Yes</span></td><td class="tm">~6s</td><td class="fr">Dark, aiming at bottom field</td><td class="im">Autofocus</td></tr>
+      <tr><td class="sc">Right after a call ends</td><td><span class="op y">Yes</span></td><td class="tm">~5s</td><td class="fr">Several thoughts at once</td><td class="im">Keep focus after Enter (burst)</td></tr>
+      <tr><td class="sc">Brainstorm, ideas fast</td><td><span class="op y">Yes</span></td><td class="tm">~5s→2s ea.</td><td class="fr">Re-aiming at field between ideas</td><td class="im">Keep focus after Enter + autofocus</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="find">
+    <h2>What the 32 tests agree on</h2>
+    <ul>
+      <li><b>One friction dominates (~26 of 32):</b> the field is <b>not focused on open</b> and sits at the <b>bottom</b> — every capture pays a look-down + tap before the first keystroke. This is the whole gap vs. Apple Notes.</li>
+      <li><b>Precision fails hands-first (~6):</b> gloves, wet, cold, or sweaty hands miss the small target. A bigger hit area fixes it without any new feature.</li>
+      <li><b>Text can't win 2 cases</b> (driving, shower) — eyes and hands are fully committed. Honest verdict: don't pretend to; those need voice, which is out of scope.</li>
+      <li><b>Burst capture already works</b> — focus persists after Enter — but autofocus is what makes the <i>first</i> line as fast as the rest.</li>
+    </ul>
+  </div>
+
+  <div class="pass">
+    <b>Verdict:</b> As-is, Capture <b>ties</b> Apple Notes — both cost an open + a tap. It <b>passes</b> ("faster than Notes") only with one pure-speed change: <b>autofocus the field on open + keep it focused after Enter</b>, plus a larger tap target for hands-first cases. That single change is applied in <a href="capture.html" style="color:var(--accent)">Capture →</a>. No search, AI, weekly review, or Executive until this holds.
+  </div>
+</div>
+<script src="theme.js"></script>
+</body>
+</html>

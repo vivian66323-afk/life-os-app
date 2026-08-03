@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Life OS</title>
+
+<!-- Installable shell. Packaging only — no product behaviour lives here. -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#f4f4f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0c0d11" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Life OS">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+<link rel="stylesheet" href="../prototype/styles.css">
+<style>
+  /* Starter spec — scoped presentation, carried over verbatim from the frozen prototype */
+  body { padding-top: 52px; }
+  .app { max-width: 452px; }
+
+  .topbar { margin-bottom: 34px; }
+  .brand { display: none; }
+  /* The name and email sit CENTRED — asked for on 2026-07-30, replacing the
+     left-aligned version from earlier the same day. The theme toggle ends up at
+     the right as a consequence: once the middle is claimed, it has to go
+     somewhere, and the right is where a screen expects it. */
+  /* The theme toggle is taken OUT of the flow, so the name centres on the real
+     middle of the screen rather than on the middle of whatever the toggle left
+     over — which put it half a button's width to the left. */
+  .toolbar { flex: 1; position: relative; }
+  .toolbar #theme { position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
+  .iconbtn { border: none; background: none; box-shadow: none; color: var(--text-3); }
+  .iconbtn:hover { color: var(--text-2); }
+  .iconbtn:active { transform: none; }
+
+  .stage { padding: 42px 38px 28px; border-radius: 30px;
+    box-shadow: 0 1px 2px rgba(20,20,40,.03), 0 22px 60px rgba(20,20,40,.06); }
+  @media (max-width: 520px){ .stage { padding: 32px 24px 22px; border-radius: 26px; } body { padding-top: 30px; } }
+
+  .daymeta { font-size: 11.5px; letter-spacing: 0.07em; font-weight: 600; color: var(--text-3); }
+  .greeting { font-size: 24px; font-weight: 600; margin-top: 9px; letter-spacing: -0.021em; }
+
+  .onething { margin-top: 30px; padding: 24px 24px 22px; border-radius: 20px; border: 1px solid var(--line);
+    background: linear-gradient(165deg, var(--star-soft), transparent 62%), var(--panel);
+    box-shadow: 0 10px 34px rgba(20,20,40,.05); }
+  .onething .ot-label { font-size: 10.5px; letter-spacing: 0.13em; color: var(--text-3); }
+  .onething .ot-label .star { color: var(--star); font-size: 12px; }
+  .onething .ot-title { font-size: 22px; font-weight: 600; margin-top: 14px; letter-spacing: -0.02em; gap: 15px; }
+  .onething .ot-hint { font-style: normal; font-size: 13px; color: var(--text-3); margin-top: 11px; }
+
+  .section { margin-top: 30px; }
+  .section-label { font-size: 10.5px; letter-spacing: 0.13em; color: var(--text-3); margin-bottom: 4px; }
+  .task { padding: 13px 10px; gap: 15px; }
+  .task-title { font-size: 16px; font-weight: 450; }
+  .task-meta { font-size: 12.5px; margin-top: 3px; }
+
+  .task .check, .onething .check { width: 22px; height: 22px; }
+  .task .check::before, .onething .check::before { content: ""; position: absolute; inset: -11px; border-radius: 50%; }
+
+  .waiting { margin-top: 28px; display: flex; align-items: center; gap: 11px; font-size: 13.5px; color: var(--text-3); }
+  .waiting .wdot { width: 7px; height: 7px; border-radius: 50%; background: var(--star); box-shadow: 0 0 0 4px var(--star-soft); flex: none; }
+
+  .later { margin-top: 26px; }
+  .later-toggle { color: var(--text-3); font-size: 13px; }
+
+  .capture { margin-top: 14px; border-radius: 16px; padding: 6px 8px 6px 18px; }
+  .capture input { font-size: 15.5px; padding: 14px 6px; }
+  /* Was a decorative glyph; now it is the third way to file a thought. */
+  .capture .plus { border: none; background: none; cursor: pointer; font-family: inherit;
+    font-size: 22px; line-height: 1; color: var(--text-3); padding: 8px 12px; flex: none; }
+  .capture .plus:active { color: var(--accent); }
+
+  .silence { display: none; text-align: center; color: var(--text-2); font-size: 19px; font-weight: 500; letter-spacing: -0.01em; padding: 64px 0 56px; }
+  /* First run — the only screen that explains itself. Reached once, then never
+     again; Silence Mode keeps its wordless calm for every day after. */
+  .welcome { margin-top: 30px; padding: 24px 24px 22px; border-radius: 20px;
+    border: 1px dashed var(--line); background: var(--panel-2); }
+  .welcome-title { font-size: 18px; font-weight: 600; letter-spacing: -0.015em; }
+  .welcome-body { font-size: 14.5px; line-height: 1.7; color: var(--text-2); margin-top: 10px; }
+  .welcome-hint { font-size: 12.5px; color: var(--text-3); margin-top: 12px; }
+
+  /* All five tabs on screen at once, at full size. They wrap onto a second row
+     rather than scrolling — a tab you have to go looking for is a tab you
+     forget exists. */
+  .lens { margin-top: 24px; flex-wrap: wrap; gap: 4px; }
+  .lens button { flex: 1 0 auto; white-space: nowrap; padding: 9px 12px; }
+  /* The sliding highlight cannot follow a button onto a second row, so the
+     active tab is painted directly instead. */
+  .lens .glider { display: none; }
+  .lens button.active { background: var(--panel); box-shadow: var(--shadow); }
+  .lens-caption { margin-top: 16px; }
+
+  /* Caption on the left, the one 編輯 on the right. */
+  .caption-row { display: flex; align-items: baseline; gap: 12px; }
+  .caption-row .lens-caption { flex: 1; min-width: 0; }
+  .editbtn { flex: none; font-family: inherit; font-size: 13px; font-weight: 600;
+    color: var(--text-3); background: none; border: none; cursor: pointer;
+    padding: 4px 2px; margin-top: 16px; white-space: nowrap; }
+  .editbtn:active { color: var(--accent); }
+  .editbtn.on { color: var(--accent); }
+  /* While editing, the whole stage says so — otherwise "why did tapping this
+     open a keyboard?" is a question the app asks the person. */
+  .edit-help { font-size: 12.5px; color: var(--accent); margin-top: 6px; }
+
+  /* 公司 / 個人 inside a section. Deliberately quieter than a section label:
+     it groups rows, it is not a new place for a thought to live. */
+  .scope-label { display: flex; align-items: baseline; gap: 7px; font-size: 11px;
+    font-weight: 650; letter-spacing: 0.06em; color: var(--text-3);
+    margin: 14px 0 2px; }
+  .scope-label:first-child { margin-top: 2px; }
+  .scope-label .scope-note { font-weight: 500; letter-spacing: 0; opacity: .7; }
+  .scope-label.company { color: var(--designer); }
+
+  .tag { font-size: 11px; padding: 2px 8px; }
+  /* The empty slot for a thought that has never been filed. Only reachable in
+     編輯 mode, and quiet enough that it does not read as a warning. */
+  .tag.none { color: var(--text-3); border-style: dashed; }
+  .tag.none .dot { background: var(--line-2); }
+  .task .tag, .onething .tag { margin-left: auto; }
+  .balance { margin-left: auto; }
+  @media (max-width: 520px) {
+    /* Deliberately NOT shrinking the tab text — it was cut to 12.5px to make
+       six labels fit, and small labels on the main navigation is a bad trade.
+       The row scrolls sideways instead. */
+    .balance { display: none; } /* the nudge is never worth cramping the row */
+  }
+
+  /* The lens stays put in Silence Mode. It is navigation, not content: hiding
+     it meant a cleared day left you with no way to switch to another one. */
+  /* The date and the greeting belong to the DAY, not to the hat you happen to
+     be looking through. An empty hat is one quiet drawer, not a finished day —
+     so .is-scoped (any lens but 全部) keeps the header standing and only the
+     content collapses. Losing "早安" by tapping 家庭 read as a broken app. */
+  .stage.is-clear:not(.is-scoped) .daymeta,
+  .stage.is-clear:not(.is-scoped) .greeting,
+  .stage.is-clear .welcome,
+  .stage.is-clear #onething,
+  .stage.is-clear #needsSection,
+  .stage.is-clear #todaySection,
+  .stage.is-clear #todoSection,
+  .stage.is-clear .waiting,
+  .stage.is-clear .later { display: none; }
+  .stage.is-clear .silence { display: block; animation: los-fade .5s ease both; }
+  @keyframes los-fade { from { opacity: 0; } to { opacity: 1; } }
+  .waiting { cursor: pointer; transition: opacity .4s ease; }
+
+  /* Build stamp. Tiny and muted, but always there: "did it update?" should be
+     answerable by looking, not by guessing. */
+  /* Schedule band — visually quieter than anything you can act on, so it can
+     never be mistaken for a list of things to do. */
+  .sched-note { letter-spacing: 0; font-weight: 400; opacity: .65; margin-left: 6px; }
+  .sched-item { display: flex; align-items: baseline; gap: 12px; padding: 9px 10px;
+    font-size: 15px; color: var(--text-2); }
+  .sched-time { flex: none; width: 46px; font-size: 12.5px; font-weight: 600;
+    color: var(--text-3); font-variant-numeric: tabular-nums; }
+  .sched-title { flex: 1; }
+  .headrow { display: flex; align-items: center; gap: 10px; min-height: 34px; flex-wrap: wrap; }
+  /* Not flex:1 any more — the greeting took every spare pixel and left the switch
+     beside it nothing to sit in. */
+  .headrow .greeting { flex: 0 1 auto; }
+
+  /* 全部 · 公司 · 個人. Small on purpose: it is a lens, not the navigation. */
+  .scopeswitch { display: flex; gap: 2px; margin-left: auto; flex: none;
+    background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px;
+    padding: 3px; }
+  .scopeswitch button { font-family: inherit; font-size: 12px; font-weight: 600;
+    color: var(--text-3); background: none; border: none; cursor: pointer;
+    padding: 5px 9px; border-radius: 7px; white-space: nowrap; }
+  .scopeswitch button.active { background: var(--panel); color: var(--text);
+    box-shadow: var(--shadow); }
+  .scopeswitch button.company.active { color: var(--designer); }
+
+  /* Capture is closed in 全部, because a new thought there has no side to join.
+     Visibly closed, never silently: a field that swallows what you typed is the
+     one thing this app must never do. */
+  .capture.locked { opacity: .6; }
+  .capture.locked input { cursor: not-allowed; }
+  .capture.locked .plus { opacity: .4; pointer-events: none; }
+  /* Pinned right by its own margin, not by a sibling's presence: Silence Mode
+     hides the greeting, and anything relying on that sibling to push it over
+     collapses to the left edge the moment it does. */
+  #bulkCal { flex: none; margin-left: auto; }
+  .bulk-btn { display: inline-flex; align-items: center; gap: 6px; font-family: inherit;
+    font-size: 13px; font-weight: 600; color: #fff; background: var(--accent);
+    border: none; border-radius: 999px; padding: 8px 13px; cursor: pointer;
+    white-space: nowrap; }
+  .bulk-btn:active { transform: scale(.97); }
+  .bulk-btn:disabled { background: var(--panel-2); color: var(--text-3);
+    cursor: default; box-shadow: none; }
+  .bulk-btn:disabled:active { transform: none; }
+  .bulk-btn .n { font-variant-numeric: tabular-nums; opacity: .85; }
+  #calBox { margin-top: 20px; }
+  .cal-connect { margin-top: 0; font-size: 14px; font-weight: 550; color: #fff;
+    background: var(--accent); border: none; border-radius: 12px; padding: 12px 16px;
+    cursor: pointer; font-family: inherit; width: 100%; }
+  .cal-status { margin-top: 8px; font-size: 12px; color: var(--text-3); text-align: center;
+    line-height: 1.5; }
+  .cal-status.bad { color: var(--warn, #d98324); }
+
+  /* Time wheel — hour and minute columns, scrolled vertically. Time stays
+     OPTIONAL: nothing is selected until you touch it, so capture is still
+     just type-and-Enter. */
+  /* ONE row visible per column. Showing the neighbouring numbers made the
+     control 220px tall (height + padding under content-box), which overflowed
+     the wheel and covered the date strip above it. It also just added noise:
+     the only number that matters is the one you have landed on. */
+  .wheel { position: relative; display: flex; align-items: center; gap: 2px;
+    margin-top: 12px; padding: 0 4px; height: 46px; }
+  .wheel-col { height: 46px; box-sizing: border-box; overflow-y: auto;
+    scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; overscroll-behavior: contain; }
+  .wheel-col::-webkit-scrollbar { display: none; }
+  .wheel-col button { display: block; height: 46px; line-height: 46px; padding: 0 12px;
+    scroll-snap-align: start; background: none; border: none; cursor: ns-resize;
+    font-family: inherit; font-size: 20px; font-variant-numeric: tabular-nums;
+    color: var(--text); font-weight: 600; width: 100%; }
+  .wheel-ap button { font-size: 16px; padding: 0 8px; }
+  .wheel-sep { font-size: 20px; color: var(--text-3); font-weight: 600; }
+  .wheel-hint { font-size: 10px; color: var(--text-3); letter-spacing: .1em;
+    margin-left: 6px; opacity: .7; }
+  .wheel-band { position: absolute; left: 0; right: 0; top: 0; height: 46px;
+    border: 1px solid var(--line);
+    background: var(--panel-2); border-radius: 12px; pointer-events: none; z-index: 0; }
+  .wheel-col, .wheel-sep, .wheel-clear, .wheel-hint { position: relative; z-index: 1; }
+  .wheel-clear { margin-left: auto; font-family: inherit; font-size: 13px; font-weight: 550;
+    color: var(--text-2); background: var(--panel-2); border: 1px solid var(--line);
+    border-radius: 999px; padding: 8px 14px; cursor: pointer; }
+  .wheel-clear.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .wheel.editing { box-shadow: 0 0 0 2px var(--accent-soft); border-radius: 14px; }
+
+  /* Date strip stays horizontal: dates read as words (今天/明天/7/30), not as
+     two spinning number columns. */
+  #dateStrip { margin-top: 30px; }
+  .timestrip { display: flex; }
+  #dateStrip button.on { background: var(--star); border-color: var(--star); color: #1b1400; }
+  .task-date { flex: none; font-size: 12px; font-weight: 600; color: var(--star);
+    font-variant-numeric: tabular-nums; padding: 2px 4px; }
+  .timestrip { display: flex; gap: 6px; margin-top: 10px; padding: 2px 2px 8px;
+    overflow-x: auto; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; scroll-snap-type: x proximity; }
+  .timestrip::-webkit-scrollbar { display: none; }
+  .timestrip button { flex: none; scroll-snap-align: center; font-family: inherit;
+    font-size: 13.5px; font-weight: 550; font-variant-numeric: tabular-nums;
+    color: var(--text-2); background: var(--panel-2); border: 1px solid var(--line);
+    border-radius: 999px; padding: 8px 14px; cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s; }
+  .timestrip button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .timestrip button.now { border-color: var(--accent-2); }
+  .timestrip button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .timestrip.editing { box-shadow: inset 0 0 0 2px var(--accent-soft); border-radius: 12px; }
+  .task-time { flex: none; font-size: 12.5px; font-weight: 600; color: var(--text-3);
+    font-variant-numeric: tabular-nums; background: none; border: none;
+    font-family: inherit; cursor: pointer; padding: 2px 4px; }
+  .task-time.set { color: var(--accent); }
+
+  /* Editing happens in place, but only in 編輯 mode. The title is the control —
+     no pencil icon on every row, no detail screen to open and come back from.
+     Outside 編輯 mode a row is for reading and ticking off, nothing else. */
+  .task-title { cursor: default; }
+  .stage.editing .task-title { cursor: text; }
+  /* A row carries its whole set of controls while editing, so on a narrow phone
+     let them wrap under the title rather than crushing the words. */
+  .stage.editing .task { flex-wrap: wrap; row-gap: 4px; }
+  .stage.editing .task-body { flex: 1 0 62%; }
+  /* An empty time or date slot: visible enough to tap, quiet enough not to nag. */
+  .task-time.empty, .task-date.empty { color: var(--text-3); font-weight: 550; opacity: .8; }
+  .task-edit { width: 100%; font-family: inherit; font-size: 16px; font-weight: 450;
+    color: var(--text); background: none; border: none; outline: none;
+    border-bottom: 1.5px solid var(--accent); padding: 1px 0; }
+  .row-cal { flex: none; font-family: inherit; font-size: 12.5px; font-weight: 600;
+    color: var(--accent); background: none; border: none; cursor: pointer;
+    padding: 4px 8px; border-radius: 8px; text-decoration: none; white-space: nowrap; }
+  .row-cal:active { background: var(--accent-soft); }
+  .row-del { flex: none; font-family: inherit; font-size: 12.5px; font-weight: 600;
+    color: var(--warn, #d98324); background: none; border: none; cursor: pointer;
+    padding: 4px 8px; border-radius: 8px; }
+  .row-del:active { background: var(--star-soft); }
+  /* The confirm, once the red ⊖ is tapped. Solid, because "are you sure" has to
+     look like the last step and not like more chrome. */
+  .row-del.armed { background: var(--warn, #d98324); color: #fff; padding: 5px 12px; }
+
+  /* In 編輯 mode the left-hand circle is a delete, not a tick. Red and filled, so
+     there is no chance of reading it as "complete" — it does the opposite. */
+  .task .check.del { border-color: var(--warn, #d98324); background: var(--warn, #d98324);
+    color: #fff; font-family: inherit; font-size: 15px; font-weight: 700; line-height: 1;
+    display: flex; align-items: center; justify-content: center; padding: 0; }
+  .task .check.del::after { content: none; }
+
+  /* The studio account. A text button, not an avatar: it has to say whether you
+     are signed in, and a circle with an initial in it does not say that. */
+  .acctbtn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px;
+    font-family: inherit; background: none; border: none; cursor: pointer;
+    padding: 4px 8px; border-radius: 8px; text-align: center; }
+  .acctbtn .acctname { font-size: 12.5px; font-weight: 600; color: var(--text-3);
+    white-space: nowrap; }
+  .acctbtn .acctmail { font-size: 10.5px; font-weight: 500; color: var(--text-3);
+    opacity: .6; white-space: nowrap; }
+  .acctbtn:active, .acctbtn.on { color: var(--accent); }
+  .acctbox { margin-top: 18px; padding: 18px 18px 16px; border-radius: 18px;
+    border: 1px solid var(--line); background: var(--panel-2); }
+  .acctbox h4 { font-size: 14.5px; font-weight: 650; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .acctbox p { font-size: 12.5px; color: var(--text-3); margin: 0 0 12px; line-height: 1.6; }
+  .acctbox input { display: block; width: 100%; box-sizing: border-box; font-family: inherit;
+    font-size: 15px; padding: 11px 12px; margin-bottom: 8px; color: var(--text);
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+  .acctbox input:focus { outline: none; border-color: var(--accent); }
+  .acctrow { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+  .acctbox button { font-family: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer;
+    padding: 10px 16px; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--panel); color: var(--text); }
+  .acctbox button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .acctbox .msg { font-size: 12.5px; margin-top: 10px; line-height: 1.6; }
+  .acctbox .msg.bad { color: var(--warn, #d98324); }
+  .acctbox .spacer { margin-left: auto; }
+  .acctlabel { font-size: 11px; font-weight: 650; letter-spacing: .06em;
+    color: var(--text-3); margin: 14px 0 5px; }
+  .wsswitch { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 4px; }
+  .wsswitch button { font-size: 12.5px; padding: 7px 12px; }
+  .wsswitch button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .wsroster { margin-bottom: 4px; }
+  .wsperson { display: flex; align-items: center; gap: 8px; font-size: 13.5px;
+    color: var(--text-2); padding: 4px 0; }
+  .wsperson.mine { color: var(--text-3); }
+  .wsdrop { margin-left: auto; font-size: 12px; padding: 3px 9px;
+    color: var(--warn, #d98324); background: none; border: none; cursor: pointer; }
+  .wsperson[data-pick] { cursor: pointer; border-radius: 8px; padding: 6px 8px; margin: 0 -8px; }
+  .wsperson.picked { background: var(--panel); box-shadow: var(--shadow); }
+  .wscount { margin-left: auto; font-size: 12px; color: var(--text-3); }
+  .acctbox button.wide { display: block; width: 100%; padding: 12px 16px; font-size: 14.5px; }
+  /* The password route stays reachable but stops competing for attention. */
+  .acctalt { font-size: 12px; color: var(--text-3); text-align: center;
+    margin: 14px 0 10px; }
+
+  /* Somebody else's thought. Visible because that is the point of a shared list,
+     inert because the database would refuse the write anyway — and a checkbox
+     that fails silently is worse than no checkbox. */
+  .task.foreign .check { border-style: dashed; cursor: default; opacity: .55; }
+  .task.foreign .task-title { cursor: default; }
+  /* A byline under the title. Your own name is quieter than a colleague's — it is
+     there so you can account for a row, not to introduce you to yourself. */
+  .whose { font-size: 12px; font-weight: 600; color: var(--text-3); margin-top: 2px; }
+  .whose.mine { opacity: .5; font-weight: 500; }
+
+  .build { margin-top: 18px; text-align: center; font-size: 10px; letter-spacing: .08em;
+    color: var(--text-3); opacity: .5; font-variant-numeric: tabular-nums; }
+
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand"><span class="mark"></span>Life OS</div>
+    <div class="toolbar">
+      <button class="acctbtn" id="acct" type="button" hidden></button>
+      <button class="iconbtn" id="theme" data-t-title="themeToggle">☾</button>
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="daymeta" id="daymeta"></div>
+    <div class="headrow">
+      <div class="greeting" id="greeting"></div>
+      <!-- 全部 · 公司 · 個人. Which half of the world you are looking at, and —
+           when it is not 全部 — which half a new thought joins. -->
+      <div class="scopeswitch" id="scopeSwitch" role="group"></div>
+      <!-- Always reachable, whichever tab you are on. It used to live inside
+           未來一周規劃, which meant remembering to go there first. -->
+      <div id="bulkCal"></div>
+    </div>
+
+    <!-- Level 2 · the identity lens. Built from state.roles, so the hats are the
+         user's own words, not names baked into the markup. -->
+    <div class="lens" id="lens" hidden>
+      <span class="glider" id="glider"></span>
+    </div>
+    <!-- One 編輯 for the whole list, pinned to the right under the tabs. Rows
+         are inert until it is on, so a thumb brushing a line while scrolling
+         cannot retime, re-file or rename anything. -->
+    <div class="caption-row" id="captionRow" hidden>
+      <div class="lens-caption" id="caption"></div>
+      <button class="editbtn" id="editToggle" type="button"></button>
+    </div>
+
+    <!-- The studio account. Closed by default and never in the way: the app is
+         fully usable signed out, and signing in is not a precondition for
+         writing a thought down. -->
+    <div class="acctbox" id="acctBox" hidden></div>
+
+    <!-- First run only: an empty screen read as "broken" to a real user. -->
+    <div class="welcome" id="welcome" hidden>
+      <div class="welcome-title" data-t="welcomeTitle"></div>
+      <p class="welcome-body" data-t="welcomeBody"></p>
+      <p class="welcome-hint" data-t="welcomeHint"></p>
+    </div>
+
+    <div class="onething clearable" id="onething" hidden>
+      <div class="ot-label"><span class="star">★</span> <span data-t="oneLabel"></span></div>
+      <div class="ot-title"><button class="check" data-check data-t-aria="complete"></button><span class="ot-text"></span></div>
+      <div class="ot-hint" data-t="oneHint"></div>
+    </div>
+
+    <!-- Calendar controls live UP HERE, next to the schedule they belong to.
+         They used to be appended at the bottom of the card, where an
+         overflowing time wheel covered them and swallowed the taps — the button
+         looked present and did nothing. Fixed placement is the guard. -->
+    <!-- Batch export, shown at the top of 未來一周規劃 where the week you are
+         about to commit to is in front of you. -->
+    <div id="bulkCal"></div>
+
+    <div id="calBox"></div>
+
+    <!-- Read-only. Events are context for when thoughts happen, never tasks
+         (see gcal.js) — note there is no checkbox anywhere in here. -->
+    <div class="section" id="schedSection" hidden>
+      <div class="section-label"><span data-t="schedule"></span> <span class="sched-note" data-t="calNote"></span></div>
+      <div id="sched"></div>
+    </div>
+
+    <div class="section" id="needsSection" hidden>
+      <div class="section-label" data-t="needsYou"></div>
+      <div id="needs"></div>
+    </div>
+
+    <div class="section" id="todaySection" hidden>
+      <div class="section-label" data-t="today"></div>
+      <div id="today"></div>
+    </div>
+
+    <!-- Between 今天 and 以後 on purpose: captured but not scheduled sits
+         between "planned for today" and "not this week". Split into 公司 /
+         個人 by app.js when both are present. -->
+    <div class="section" id="todoSection" hidden>
+      <div class="section-label" data-t="todo"></div>
+      <div id="todo"></div>
+    </div>
+
+    <div class="waiting" id="waiting" hidden><span class="wdot"></span><span data-t="waiting"></span></div>
+
+    <div class="later" id="later" hidden>
+      <button class="later-toggle" id="laterToggle"><span class="chev">▶</span> <span data-t="later"></span> <span id="laterCount" style="color:var(--text-3)"></span><span class="balance" id="balance" hidden></span></button>
+      <div class="later-list" id="laterList"></div>
+    </div>
+
+    <div class="silence" data-t="silence"></div>
+
+    <!-- Visible and swipeable. A hidden clock button was too easy to miss, and
+         a control you can't see is a control that doesn't exist. -->
+    <!-- When first, then what. -->
+    <div class="timestrip" id="dateStrip" role="group" data-t-aria="pickDate"></div>
+    <!-- 上午/下午 · 時 · 分, each scrolling vertically and each wrapping round:
+         past 55 comes 00, past 12 comes 1. Rows are tappable too, which keeps
+         the control usable without a touchscreen. -->
+    <div class="wheel" id="timeWheel" role="group" data-t-aria="setTime">
+      <div class="wheel-band" aria-hidden="true"></div>
+      <div class="wheel-col wheel-ap" id="wheelAP"></div>
+      <div class="wheel-col" id="wheelH"></div>
+      <div class="wheel-sep" aria-hidden="true">:</div>
+      <div class="wheel-col" id="wheelM"></div>
+      <button class="wheel-clear" id="wheelClear" type="button" data-t="anytime"></button>
+    </div>
+    <div class="capture">
+      <input id="captureInput" type="text" data-t-placeholder="capture" autocomplete="off"
+             enterkeyhint="done">
+      <button class="plus" id="capturePlus" type="button" data-t-aria="capture">+</button>
+    </div>
+    <div class="build" id="build">180ab98</div>
+  </div>
+</div>
+
+<script src="../prototype/theme.js"></script>
+<script src="config.js"></script>
+<script src="strings.js"></script>
+<script src="model.js"></script>
+<script src="storage.js"></script>
+<script src="cloud.js"></script>
+<script src="demo.js"></script>
+<script src="gcal.js"></script>
+<script src="share.js"></script>
+<script src="app.js"></script>
+
+<script>
+  /* Offline shell. Failing to register is not fatal — the app still runs.
+   *
+   * An installed app is almost never "closed", so it will happily run an old
+   * build forever unless we go looking for a new one. Check on launch and every
+   * time the app comes back to the foreground, and reload once when a new worker
+   * takes over. Guarded so it can never loop. */
+  if ('serviceWorker' in navigator) {
+    var reloading = false;
+
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      if (reloading) return;
+      reloading = true;
+      window.location.reload();
+    });
+
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').then(function (reg) {
+        reg.update()['catch'](function () {});
+        document.addEventListener('visibilitychange', function () {
+          if (!document.hidden) reg.update()['catch'](function () {});
+        });
+      })['catch'](function () {});
+    });
+  }
+</script>
+</body>
+</html>

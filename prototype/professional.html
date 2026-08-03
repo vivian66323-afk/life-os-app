@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Life OS — Professional</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app wide">
+  <div class="topbar">
+    <div class="brand"><span class="mark"></span>Life OS</div>
+    <div class="toolbar">
+      <nav class="levelnav">
+        <a href="starter.html">Starter</a>
+        <a href="professional.html" class="active">Professional</a>
+        <a href="executive.html">Executive</a>
+      </nav>
+      <button class="iconbtn" id="theme" title="Toggle light / dark">☾</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="daymeta">Thursday · 17 July</div>
+    <div class="greeting">Good morning, Vivian.</div>
+
+    <div class="lens" id="lens">
+      <span class="glider" id="glider"></span>
+      <button class="active" data-role="all">All</button>
+      <button data-role="designer">Designer</button>
+      <button data-role="owner">Owner</button>
+      <button data-role="parent">Parent</button>
+    </div>
+    <div class="lens-caption" id="caption"><strong>Today</strong> — your whole life, one view.</div>
+
+    <div class="content" id="content">
+
+      <div class="onething clearable" data-role="designer" id="onething">
+        <div class="ot-label"><span class="star">★</span> The one thing</div>
+        <div class="ot-title"><button class="check" data-check></button><span class="ot-text">Finish the client quote</span>
+          <span class="tag designer" style="margin-left:auto"><span class="dot"></span>Designer</span></div>
+        <div class="ot-hint">If nothing else, this.</div>
+      </div>
+
+      <div class="section" data-section>
+        <div class="section-label">Needs you</div>
+        <div class="task clearable needs" data-role="owner"><button class="check" data-check></button>
+          <div class="task-body"><div class="task-title">Mr. Tan is waiting on you</div><div class="task-meta">2 days</div></div>
+          <span class="tag owner"><span class="dot"></span>Owner</span></div>
+        <div class="task clearable needs" data-role="parent"><button class="check" data-check></button>
+          <div class="task-body"><div class="task-title">Kai's school form</div><div class="task-meta">Due tomorrow</div></div>
+          <span class="tag parent"><span class="dot"></span>Parent</span></div>
+      </div>
+
+      <div class="section" data-section>
+        <div class="section-label">Today</div>
+        <div class="task clearable" data-role="designer"><button class="check" data-check></button>
+          <div class="task-body"><div class="task-title">Review site photos</div></div>
+          <span class="tag designer"><span class="dot"></span>Designer</span></div>
+        <div class="task clearable" data-role="owner"><button class="check" data-check></button>
+          <div class="task-body"><div class="task-title">Approve payroll</div></div>
+          <span class="tag owner"><span class="dot"></span>Owner</span></div>
+        <div class="task clearable" data-role="parent"><button class="check" data-check></button>
+          <div class="task-body"><div class="task-title">Pick up Kai</div><div class="task-meta">4:00 PM</div></div>
+          <span class="tag parent"><span class="dot"></span>Parent</span></div>
+      </div>
+
+      <div class="later" id="later">
+        <button class="later-toggle" id="laterToggle"><span class="chev">▶</span> Later <span style="color:var(--text-3)">· 9</span>
+          <span class="balance" data-allonly>Parent has been quiet this week</span>
+        </button>
+        <div class="later-list">
+          <div class="task" data-role="designer"><button class="check" data-check></button><div class="task-body"><div class="task-title">Order fabric samples</div></div><span class="tag designer"><span class="dot"></span>Designer</span></div>
+          <div class="task" data-role="owner"><button class="check" data-check></button><div class="task-body"><div class="task-title">Review Q3 numbers</div></div><span class="tag owner"><span class="dot"></span>Owner</span></div>
+          <div class="task" data-role="parent"><button class="check" data-check></button><div class="task-body"><div class="task-title">Plan Kai's birthday</div></div><span class="tag parent"><span class="dot"></span>Parent</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="capture">
+      <span class="plus">+</span>
+      <input id="captureInput" type="text" placeholder="Add anything…" autocomplete="off">
+    </div>
+  </div>
+</div>
+
+<script src="theme.js"></script>
+<script>
+(function(){
+  var lens = document.getElementById('lens');
+  var glider = document.getElementById('glider');
+  var caption = document.getElementById('caption');
+  var content = document.getElementById('content');
+  var buttons = lens.querySelectorAll('button');
+  var current = 'all';
+
+  var captions = {
+    all: '<strong>Today</strong> — your whole life, one view.',
+    designer: '<strong>Designer</strong> — deep in the work. The rest is put away.',
+    owner: '<strong>Owner</strong> — running the business. Just this.',
+    parent: '<strong>Parent</strong> — the rest is put away. Nothing from work will interrupt you here.'
+  };
+
+  function moveGlider(btn){
+    glider.style.width = btn.offsetWidth + 'px';
+    glider.style.transform = 'translateX(' + btn.offsetLeft + 'px)';
+  }
+  function activeBtn(){ return lens.querySelector('button.active'); }
+
+  function applyFilter(role){
+    document.querySelectorAll('[data-role]').forEach(function(el){
+      var show = role === 'all' || el.getAttribute('data-role') === role;
+      el.classList.toggle('is-hidden', !show);
+    });
+    document.querySelectorAll('[data-allonly]').forEach(function(el){
+      el.style.display = role === 'all' ? '' : 'none';
+    });
+    document.querySelectorAll('[data-section]').forEach(function(sec){
+      var visible = sec.querySelectorAll('.task:not(.is-hidden)').length;
+      sec.classList.toggle('is-hidden', visible === 0);
+    });
+    caption.innerHTML = captions[role];
+  }
+
+  function select(btn){
+    var role = btn.getAttribute('data-role');
+    if(role === current) return;
+    buttons.forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    moveGlider(btn);
+    content.classList.add('switching');
+    caption.style.opacity = '0';
+    setTimeout(function(){
+      applyFilter(role);
+      content.classList.remove('switching');
+      caption.style.opacity = '1';
+      current = role;
+    }, 180);
+  }
+
+  lens.addEventListener('click', function(e){
+    var b = e.target.closest('button');
+    if(b) select(b);
+  });
+  window.addEventListener('resize', function(){ moveGlider(activeBtn()); });
+  requestAnimationFrame(function(){ moveGlider(activeBtn()); });
+  caption.style.transition = 'opacity .18s ease';
+
+  // checks
+  document.addEventListener('click', function(e){
+    var chk = e.target.closest('[data-check]');
+    if(chk){ var row = chk.closest('.clearable') || chk.closest('.task'); if(row) row.classList.toggle('done'); }
+  });
+  // later
+  document.getElementById('laterToggle').addEventListener('click', function(e){
+    if(e.target.closest('.balance')) return;
+    document.getElementById('later').classList.toggle('open');
+  });
+  // capture
+  var input = document.getElementById('captureInput');
+  input.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' && input.value.trim()){
+      var role = current === 'all' ? 'designer' : current;
+      var sec = document.querySelectorAll('[data-section]')[1];
+      var t = document.createElement('div');
+      t.className = 'task clearable'; t.setAttribute('data-role', role);
+      t.innerHTML = '<button class="check" data-check></button><div class="task-body"><div class="task-title"></div></div><span class="tag '+role+'"><span class="dot"></span>'+role.charAt(0).toUpperCase()+role.slice(1)+'</span>';
+      t.querySelector('.task-title').textContent = input.value.trim();
+      sec.appendChild(t); input.value='';
+      t.animate([{opacity:0,transform:'translateY(-4px)'},{opacity:1,transform:'none'}],{duration:220,easing:'ease'});
+    }
+  });
+})();
+</script>
+</body>
+</html>

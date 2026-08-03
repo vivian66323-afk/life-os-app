@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Life OS — Prototypes</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .app { max-width: 560px; }
+  .hub-head { padding: 4px 4px 0; margin-bottom: 26px; }
+  .hub-title { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; }
+  .hub-sub { font-size: 14px; color: var(--text-2); margin-top: 6px; }
+  .hub-list { display: grid; gap: 12px; }
+  .hub-group { font-size: 11px; font-weight: 650; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); margin: 18px 4px 2px; }
+  .hub-card { display: flex; align-items: center; gap: 16px; text-decoration: none; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; box-shadow: var(--shadow); transition: transform .12s ease, border-color .2s ease; }
+  .hub-card:hover { transform: translateY(-1px); border-color: var(--line-2); }
+  .hub-card:active { transform: scale(.995); }
+  .hub-ic { flex: none; width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 19px; background: var(--panel-2); border: 1px solid var(--line); }
+  .hub-tx { flex: 1; min-width: 0; }
+  .hub-name { font-size: 16px; font-weight: 550; letter-spacing: -0.01em; }
+  .hub-desc { font-size: 13px; color: var(--text-3); margin-top: 2px; }
+  .hub-arrow { color: var(--text-3); font-size: 17px; }
+  .hub-card.frozen .hub-ic { color: var(--text-2); }
+  .frozen-tag { flex: none; font-size: 10.5px; font-weight: 650; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand"><span class="mark"></span>Life OS</div>
+    <div class="toolbar">
+      <button class="iconbtn" id="theme" title="Toggle light / dark">☾</button>
+    </div>
+  </div>
+
+  <div class="hub-head">
+    <div class="hub-title">Life OS Lab</div>
+  </div>
+
+  <div class="hub-group">Product</div>
+  <div class="hub-list">
+    <a class="hub-card frozen" href="starter.html">
+      <span class="hub-ic">◎</span>
+      <span class="hub-tx"><span class="hub-name">Starter</span><span class="hub-desc">The daily view — one thing, today, capture</span></span>
+      <span class="frozen-tag">Frozen</span>
+    </a>
+    <a class="hub-card" href="capture.html">
+      <span class="hub-ic">✎</span>
+      <span class="hub-tx"><span class="hub-name">Capture</span><span class="hub-desc">Save a thought in seconds — passes when opened</span></span>
+      <span class="hub-arrow">→</span>
+    </a>
+    <a class="hub-card" href="lock-capture.html">
+      <span class="hub-ic">🔒</span>
+      <span class="hub-tx"><span class="hub-name">Lock-screen Capture</span><span class="hub-desc">Save without opening the app — current sprint</span></span>
+      <span class="hub-arrow">→</span>
+    </a>
+  </div>
+
+  <div class="hub-group">Journeys</div>
+  <div class="hub-list">
+    <a class="hub-card" href="journey-busy.html">
+      <span class="hub-ic">☀</span>
+      <span class="hub-tx"><span class="hub-name">Busy Journey</span><span class="hub-desc">A back-to-back day, start to finish</span></span>
+      <span class="hub-arrow">→</span>
+    </a>
+    <a class="hub-card" href="journey-empty.html">
+      <span class="hub-ic">○</span>
+      <span class="hub-tx"><span class="hub-name">Empty Journey</span><span class="hub-desc">A day with nothing due</span></span>
+      <span class="hub-arrow">→</span>
+    </a>
+    <a class="hub-card" href="journey-site.html">
+      <span class="hub-ic">⛑</span>
+      <span class="hub-tx"><span class="hub-name">Site Journey</span><span class="hub-desc">On-site worker — gloves, sun, seconds</span></span>
+      <span class="hub-arrow">→</span>
+    </a>
+  </div>
+
+  <div class="hub-group">Research</div>
+  <div class="hub-list">
+    <a class="hub-card" href="behavior-matrix.html">
+      <span class="hub-ic">◫</span>
+      <span class="hub-tx"><span class="hub-name">Behavior Matrix</span><span class="hub-desc">Why thoughts are lost — log real misses (current)</span></span>
+      <span class="hub-arrow">→</span>
+    </a>
+    <a class="hub-card" href="capture-stress.html">
+      <span class="hub-ic">⏱</span>
+      <span class="hub-tx"><span class="hub-name">Capture Stress Test</span><span class="hub-desc">30 real-world captures — speed check</span></span>
+      <span class="hub-arrow">→</span>
+    </a>
+  </div>
+</div>
+<script src="theme.js"></script>
+</body>
+</html>

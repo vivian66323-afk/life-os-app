@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Life OS — Starter</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* ── Sprint 02: Starter polish (scoped overrides) ── */
+  body { padding-top: 52px; }
+  .app { max-width: 452px; }
+
+  /* chrome recedes */
+  .topbar { margin-bottom: 34px; }
+  .brand { display: none; }
+  .levelnav { background: none; border: none; box-shadow: none; padding: 0; gap: 0; }
+  .levelnav a { color: var(--text-3); font-weight: 500; font-size: 12px; padding: 6px 11px; letter-spacing: 0; }
+  .levelnav a:hover { color: var(--text-2); background: none; }
+  .levelnav a.active { background: none; color: var(--text); box-shadow: none; }
+  .iconbtn { border: none; background: none; box-shadow: none; color: var(--text-3); }
+  .iconbtn:hover { color: var(--text-2); }
+  .iconbtn:active { transform: none; }
+
+  /* stage */
+  .stage { padding: 42px 38px 28px; border-radius: 30px;
+    box-shadow: 0 1px 2px rgba(20,20,40,.03), 0 22px 60px rgba(20,20,40,.06); }
+  @media (max-width: 520px){ .stage { padding: 32px 24px 22px; border-radius: 26px; } body { padding-top: 30px; } }
+
+  /* header — minimal preamble */
+  .daymeta { font-size: 11.5px; letter-spacing: 0.07em; font-weight: 600; color: var(--text-3); }
+  .greeting { font-size: 24px; font-weight: 600; margin-top: 9px; letter-spacing: -0.021em; }
+
+  /* the one thing — the focal point */
+  .onething { margin-top: 30px; padding: 24px 24px 22px; border-radius: 20px; border: 1px solid var(--line);
+    background: linear-gradient(165deg, var(--star-soft), transparent 62%), var(--panel);
+    box-shadow: 0 10px 34px rgba(20,20,40,.05); }
+  .onething .ot-label { font-size: 10.5px; letter-spacing: 0.13em; color: var(--text-3); }
+  .onething .ot-label .star { color: var(--star); font-size: 12px; }
+  .onething .ot-title { font-size: 22px; font-weight: 600; margin-top: 14px; letter-spacing: -0.02em; gap: 15px; }
+  .onething .ot-hint { font-style: normal; font-size: 13px; color: var(--text-3); margin-top: 11px; }
+
+  /* sections & rows */
+  .section { margin-top: 30px; }
+  .section-label { font-size: 10.5px; letter-spacing: 0.13em; color: var(--text-3); margin-bottom: 4px; }
+  .task { padding: 13px 10px; gap: 15px; }
+  .task-title { font-size: 16px; font-weight: 450; }
+  .task-meta { font-size: 12.5px; margin-top: 3px; }
+
+  /* 44px tap targets for one-handed use */
+  .task .check, .onething .check { width: 22px; height: 22px; }
+  .task .check::before, .onething .check::before { content: ""; position: absolute; inset: -11px; border-radius: 50%; }
+
+  /* waiting — a whisper, not a pill */
+  .waiting { margin-top: 28px; display: flex; align-items: center; gap: 11px; font-size: 13.5px; color: var(--text-3); }
+  .waiting .wdot { width: 7px; height: 7px; border-radius: 50%; background: var(--star); box-shadow: 0 0 0 4px var(--star-soft); flex: none; }
+
+  /* later */
+  .later { margin-top: 26px; }
+  .later-toggle { color: var(--text-3); font-size: 13px; }
+
+  /* capture — airy, soft */
+  .capture { margin-top: 34px; border-radius: 16px; padding: 6px 8px 6px 18px; }
+  .capture input { font-size: 15.5px; padding: 14px 6px; }
+
+  /* Silence Mode — the cleared day is a quiet statement, not a performance */
+  .silence { display: none; text-align: center; color: var(--text-2); font-size: 19px; font-weight: 500; letter-spacing: -0.01em; padding: 64px 0 56px; }
+  .stage.is-clear .daymeta,
+  .stage.is-clear .greeting,
+  .stage.is-clear #onething,
+  .stage.is-clear .section,
+  .stage.is-clear .waiting,
+  .stage.is-clear .later { display: none; }
+  .stage.is-clear .silence { display: block; animation: los-fade .5s ease both; }
+  @keyframes los-fade { from { opacity: 0; } to { opacity: 1; } }
+  .waiting { cursor: pointer; transition: opacity .4s ease; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand"><span class="mark"></span>Life OS</div>
+    <div class="toolbar">
+      <nav class="levelnav">
+        <a href="starter.html" class="active">Starter</a>
+        <a href="professional.html">Professional</a>
+        <a href="executive.html">Executive</a>
+      </nav>
+      <button class="iconbtn" id="theme" title="Toggle light / dark">☾</button>
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="daymeta">Thursday, 17 July</div>
+    <div class="greeting">Good morning, Vivian.</div>
+
+    <div class="onething clearable" id="onething">
+      <div class="ot-label"><span class="star">★</span> The one thing</div>
+      <div class="ot-title"><button class="check" data-check aria-label="Complete"></button><span class="ot-text">Finish the client quote</span></div>
+      <div class="ot-hint">If nothing else, this.</div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Today</div>
+      <div id="today">
+        <div class="task clearable"><button class="check" data-check></button><div class="task-body"><div class="task-title">Reply to Mr. Tan</div></div></div>
+        <div class="task clearable"><button class="check" data-check></button><div class="task-body"><div class="task-title">Pick up prints</div><div class="task-meta">3:00 PM</div></div></div>
+      </div>
+    </div>
+
+    <div class="waiting" id="waiting"><span class="wdot"></span>Someone is waiting on you</div>
+
+    <div class="later" id="later">
+      <button class="later-toggle" id="laterToggle"><span class="chev">▶</span> Later <span style="color:var(--text-3)">· 5</span></button>
+      <div class="later-list">
+        <div class="task"><button class="check" data-check></button><div class="task-body"><div class="task-title">Water the studio plants</div></div></div>
+        <div class="task"><button class="check" data-check></button><div class="task-body"><div class="task-title">Renew library books</div></div></div>
+        <div class="task"><button class="check" data-check></button><div class="task-body"><div class="task-title">Back up the laptop</div></div></div>
+        <div class="task"><button class="check" data-check></button><div class="task-body"><div class="task-title">Reply to newsletter</div></div></div>
+        <div class="task"><button class="check" data-check></button><div class="task-body"><div class="task-title">Sketch weekend trip idea</div></div></div>
+      </div>
+    </div>
+
+    <div class="silence">Nothing needs you today.</div>
+
+    <div class="capture">
+      <span class="plus">+</span>
+      <input id="captureInput" type="text" placeholder="Add anything…" autocomplete="off">
+    </div>
+  </div>
+</div>
+
+<script src="theme.js"></script>
+<script>
+(function(){
+  var stage = document.getElementById('stage');
+  var today = document.getElementById('today');
+
+  function remaining(){ return document.querySelectorAll('.clearable:not(.done)').length; }
+  function refresh(){
+    if(remaining() === 0){ setTimeout(function(){ stage.classList.add('is-clear'); }, 340); }
+    else { stage.classList.remove('is-clear'); }
+  }
+
+  document.addEventListener('click', function(e){
+    var chk = e.target.closest('[data-check]');
+    if(chk){
+      var row = chk.closest('.clearable') || chk.closest('.task');
+      if(row){ row.classList.toggle('done'); refresh(); }
+    }
+  });
+
+  document.getElementById('laterToggle').addEventListener('click', function(){
+    document.getElementById('later').classList.toggle('open');
+  });
+
+  // Silence Mode: the "waiting" cue is shown once, then never re-nagged.
+  var waiting = document.getElementById('waiting');
+  if(waiting){
+    var seen = false;
+    try { seen = localStorage.getItem('los_waiting_seen') === '1'; } catch(e){}
+    if(seen){ waiting.style.display = 'none'; }
+    waiting.addEventListener('click', function(){
+      waiting.style.opacity = '0';
+      try { localStorage.setItem('los_waiting_seen', '1'); } catch(e){}
+      setTimeout(function(){ waiting.style.display = 'none'; }, 420);
+    });
+  }
+
+  var input = document.getElementById('captureInput');
+  input.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' && input.value.trim()){
+      var t = document.createElement('div');
+      t.className = 'task clearable';
+      t.innerHTML = '<button class="check" data-check></button><div class="task-body"><div class="task-title"></div></div>';
+      t.querySelector('.task-title').textContent = input.value.trim();
+      today.appendChild(t);
+      input.value = '';
+      refresh();
+      t.animate([{opacity:0, transform:'translateY(-4px)'},{opacity:1, transform:'none'}], {duration:220, easing:'ease'});
+    }
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Life OS — Executive</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app exec">
+  <div class="topbar">
+    <div class="brand"><span class="mark"></span>Life OS</div>
+    <div class="toolbar">
+      <nav class="levelnav">
+        <a href="starter.html">Starter</a>
+        <a href="professional.html">Professional</a>
+        <a href="executive.html" class="active">Executive</a>
+      </nav>
+      <button class="iconbtn" id="theme" title="Toggle light / dark">☾</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="daymeta">Thursday · 17 July · 08:30 · Studio</div>
+    <div class="greeting">Good morning, Vivian.</div>
+
+    <div class="exec-title">What only you can do today</div>
+    <div class="apex">
+      <div class="task clearable"><span class="star">★</span><button class="check" data-check></button>
+        <div class="task-body"><div class="task-title">Approve the Lin contract</div><div class="task-meta">Client waiting since Tuesday</div></div></div>
+      <div class="task clearable"><span class="star">★</span><button class="check" data-check></button>
+        <div class="task-body"><div class="task-title">Decide: hire a 2nd PM, or outsource</div><div class="task-meta">Blocking 3 projects</div></div></div>
+    </div>
+
+    <div class="exec-title">Decisions waiting on you <span class="badge" id="decCount">3</span></div>
+    <div id="decisions">
+      <div class="decision"><span class="flag agent">⌁</span>
+        <div class="who"><div class="name"><b>Agent</b> · drafted 3 client replies</div><div class="act">Review &amp; send</div></div>
+        <button class="approve" data-approve>Review</button></div>
+      <div class="decision"><span class="flag person">➊</span>
+        <div class="who"><div class="name"><b>Angela</b> · sign-off on tile order</div><div class="act">NT$62,400 · Tan Residence</div></div>
+        <button class="approve" data-approve>Approve</button></div>
+      <div class="decision"><span class="flag person">➊</span>
+        <div class="who"><div class="name"><b>Bookkeeper</b> · 2 invoices to release</div><div class="act">Awaiting your OK</div></div>
+        <button class="approve" data-approve>Approve</button></div>
+    </div>
+
+    <div class="exec-title">Risk radar</div>
+    <div>
+      <div class="risk"><span class="flag warn">⚠</span><div class="risk-body"><div class="risk-title"><b>Tan Residence</b> — no progress</div><div class="task-meta">8 days quiet</div></div></div>
+      <div class="risk"><span class="flag risk">⚠</span><div class="risk-body"><div class="risk-title"><b>Cash</b> — 2 invoices overdue</div><div class="task-meta">NT$480,000 outstanding</div></div></div>
+      <div class="risk"><span class="flag watch">◔</span><div class="risk-body"><div class="risk-title"><b>Bellevue</b> handover in 5 days</div><div class="task-meta">3 open items</div></div></div>
+    </div>
+
+    <div class="handled" id="handled">
+      <div class="handled-head" id="handledHead">
+        <span class="lead">In motion — handled, nothing needed</span>
+        <span class="n">214 items</span>
+        <span class="chev">▶</span>
+      </div>
+      <div class="handled-body">
+        <div class="row"><span class="dot-ok"></span>7 projects on track</div>
+        <div class="row"><span class="dot-ok"></span>4 agents working</div>
+        <div class="row"><span class="dot-ok"></span>Team clear — no one blocked</div>
+      </div>
+    </div>
+
+    <div class="divider"><span class="label">Your life</span><span class="line"></span><span class="aside">still yours</span></div>
+    <div id="life">
+      <div class="task clearable"><button class="check" data-check></button>
+        <div class="task-body"><div class="task-title">Pick up Kai</div><div class="task-meta">4:00 PM</div></div></div>
+    </div>
+    <div class="life-note">You haven't taken a day off in 9 days.</div>
+
+    <div class="capture">
+      <span class="plus">+</span>
+      <input id="captureInput" type="text" placeholder="Add anything…" autocomplete="off">
+    </div>
+  </div>
+</div>
+
+<script src="theme.js"></script>
+<script>
+(function(){
+  var decCount = document.getElementById('decCount');
+  function updateBadge(){
+    var n = document.querySelectorAll('#decisions .decision:not(.resolved)').length;
+    decCount.textContent = n;
+    decCount.style.opacity = n === 0 ? '.4' : '1';
+  }
+
+  document.addEventListener('click', function(e){
+    var ap = e.target.closest('[data-approve]');
+    if(ap){
+      var row = ap.closest('.decision');
+      ap.textContent = '✓ Done';
+      ap.style.pointerEvents = 'none';
+      setTimeout(function(){
+        row.classList.add('resolved');
+        setTimeout(function(){ row.style.display = 'none'; updateBadge(); }, 300);
+      }, 180);
+      return;
+    }
+    var chk = e.target.closest('[data-check]');
+    if(chk){ var t = chk.closest('.clearable') || chk.closest('.task'); if(t) t.classList.toggle('done'); }
+  });
+
+  document.getElementById('handledHead').addEventListener('click', function(){
+    document.getElementById('handled').classList.toggle('open');
+  });
+
+  var input = document.getElementById('captureInput');
+  input.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' && input.value.trim()){
+      var t = document.createElement('div');
+      t.className = 'task clearable';
+      t.innerHTML = '<button class="check" data-check></button><div class="task-body"><div class="task-title"></div></div>';
+      t.querySelector('.task-title').textContent = input.value.trim();
+      document.getElementById('life').appendChild(t); input.value='';
+      t.animate([{opacity:0,transform:'translateY(-4px)'},{opacity:1,transform:'none'}],{duration:220,easing:'ease'});
+    }
+  });
+})();
+</script>
+</body>
+</html>

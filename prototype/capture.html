@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Life OS — Capture</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="journey.css">
+<style>
+  /* Sprint: Capture — the one speed fix. Autofocus on open, stay focused after Enter, big target. */
+  .qc { max-width: 452px; margin: 2px 0 30px; }
+  .qc-bar { display: flex; align-items: center; gap: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 6px 8px 6px 18px; box-shadow: var(--shadow); transition: border-color .2s, box-shadow .2s; }
+  .qc-bar:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+  .qc-bar .plus { color: var(--text-3); font-size: 20px; }
+  /* big target: tall field so gloves / wet / cold hands can't miss */
+  .qc-bar input { flex: 1; border: none; background: none; outline: none; font-family: inherit; font-size: 16.5px; color: var(--text); padding: 16px 4px; min-height: 52px; }
+  .qc-bar input::placeholder { color: var(--text-3); }
+  .qc-hint { font-size: 12px; color: var(--text-3); margin: 9px 2px 0; display: flex; gap: 14px; }
+  .qc-hint .k { color: var(--text-2); }
+  .qc-list { margin-top: 14px; display: grid; gap: 8px; }
+  .qc-item { display: flex; align-items: center; gap: 11px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; padding: 11px 14px; font-size: 14.5px; }
+  .qc-item .d { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex: none; }
+  .qc-empty { font-size: 13px; color: var(--text-3); padding: 4px 2px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="mark"></span>Life OS</div>
+    <div class="toolbar">
+      <nav class="levelnav">
+        <a href="journey-busy.html">Busy day</a>
+        <a href="journey-empty.html">Empty day</a>
+        <a href="journey-site.html">On site</a>
+        <a href="capture.html" class="active">Capture</a>
+      </nav>
+      <button class="iconbtn" id="theme" title="Toggle light / dark">☾</button>
+    </div>
+  </div>
+
+  <div class="journey-head">
+    <div class="jtitle">Capture</div>
+    <div class="jpersona">Vivian · a thought surfaces mid-day · four seconds to let it go</div>
+    <div class="jhint">follow one thought from her head into the app — and back out</div>
+  </div>
+
+  <div class="qc">
+    <div class="qc-bar">
+      <span class="plus">+</span>
+      <input id="qc" type="text" placeholder="Type a thought, press Enter…" autocomplete="off" autofocus>
+    </div>
+    <div class="qc-hint"><span><span class="k">Autofocus</span> on open</span><span><span class="k">Enter</span> saves &amp; keeps the cursor</span></div>
+    <div class="qc-list" id="qcList"><div class="qc-empty">Nothing captured yet — start typing, no tap needed.</div></div>
+  </div>
+
+  <div class="filmstrip">
+
+    <div class="moment">
+      <div class="mtime">10:12</div>
+      <div class="mctx">Mid-task, a thought surfaces. She doesn't stop what she's doing — one tap opens the bar.</div>
+      <div class="phone"><div class="screen">
+        <div class="m-daymeta">Thu 17 Jul</div>
+        <div class="m-greeting">On site.</div>
+        <div class="m-sec"><div class="m-lbl">Today</div>
+          <div class="m-task"><span class="c"></span><div><div class="tt">Call the tile supplier</div></div></div>
+          <div class="m-task"><span class="c"></span><div><div class="tt">Pick up Kai</div><div class="tm">16:00</div></div></div>
+        </div>
+        <div class="m-cap typed"><span class="p">+</span>|</div>
+      </div></div>
+    </div>
+
+    <div class="moment">
+      <div class="mtime">10:12</div>
+      <div class="mctx">She types it plain. No due date, no project, no category — nothing to fill in first.</div>
+      <div class="phone"><div class="screen">
+        <div class="m-daymeta">Thu 17 Jul</div>
+        <div class="m-greeting">On site.</div>
+        <div class="m-sec"><div class="m-lbl">Today</div>
+          <div class="m-task"><span class="c"></span><div><div class="tt">Call the tile supplier</div></div></div>
+          <div class="m-task"><span class="c"></span><div><div class="tt">Pick up Kai</div><div class="tm">16:00</div></div></div>
+        </div>
+        <div class="m-cap typed"><span class="p">+</span>Order extra grout&nbsp; ⏎</div>
+      </div></div>
+    </div>
+
+    <div class="moment">
+      <div class="mtime">10:12</div>
+      <div class="mctx">It lands and gets out of the way. No confirmation to dismiss — she's already back to work.</div>
+      <div class="phone"><div class="screen">
+        <div class="m-daymeta">Thu 17 Jul</div>
+        <div class="m-greeting">On site.</div>
+        <div class="m-sec"><div class="m-lbl">Just captured</div>
+          <div class="m-task"><span class="c"></span><div><div class="tt">Order extra grout</div><div class="tm">no date · sort later</div></div></div>
+        </div>
+        <div class="m-sec"><div class="m-lbl">Today</div>
+          <div class="m-task"><span class="c"></span><div><div class="tt">Call the tile supplier</div></div></div>
+          <div class="m-task"><span class="c"></span><div><div class="tt">Pick up Kai</div><div class="tm">16:00</div></div></div>
+        </div>
+        <div class="m-cap"><span class="p">+</span>Add anything…</div>
+      </div></div>
+    </div>
+
+    <div class="moment">
+      <div class="mtime">13:20</div>
+      <div class="mctx">Hands full in the car. She holds the bar and just says it — capture doesn't need her eyes.</div>
+      <div class="phone"><div class="screen">
+        <div class="m-daymeta">Thu 17 Jul</div>
+        <div class="m-greeting">Good afternoon.</div>
+        <div class="m-sec"><div class="m-lbl">Just captured</div>
+          <div class="m-task"><span class="c"></span><div><div class="tt">Order extra grout</div><div class="tm">no date · sort later</div></div></div>
+        </div>
+        <div class="m-cap typed"><span class="p">＂</span>Ask Lin about the oak finish… &nbsp; ●</div>
+      </div></div>
+    </div>
+
+    <div class="moment">
+      <div class="mtime">21:30</div>
+      <div class="mctx">One quiet minute at night. Whatever piled up, she sorts in a few taps — where it belongs.</div>
+      <div class="phone"><div class="screen">
+        <div class="m-daymeta">Thu 17 Jul</div>
+        <div class="m-greeting">Sorting the day.</div>
+        <div class="m-sec"><div class="m-lbl">Captured today</div>
+          <div class="m-task done"><span class="c"></span><div><div class="tt">Order extra grout</div><div class="tm">→ Tomorrow</div></div></div>
+          <div class="m-task done"><span class="c"></span><div><div class="tt">Ask Lin about the oak finish</div><div class="tm">→ Lin project</div></div></div>
+          <div class="m-task"><span class="c"></span><div><div class="tt">Balcony planter idea</div><div class="tm">→ Someday</div></div></div>
+        </div>
+        <div class="m-cap"><span class="p">+</span>Add anything…</div>
+      </div></div>
+    </div>
+
+    <div class="moment">
+      <div class="mtime">21:32</div>
+      <div class="mctx">Inbox back to empty. Nothing left in her head, nothing left on the screen — done.</div>
+      <div class="phone"><div class="screen">
+        <div class="m-fill"><div class="m-silence">Nothing left to sort.</div></div>
+        <div class="m-cap"><span class="p">+</span>Add anything…</div>
+      </div></div>
+    </div>
+
+  </div>
+</div>
+<script src="theme.js"></script>
+<script>
+(function(){
+  var input = document.getElementById('qc');
+  var list = document.getElementById('qcList');
+  var empty = list.querySelector('.qc-empty');
+  // speed fix 1: ready to type the instant the surface opens — no tap
+  input.focus();
+  input.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' && input.value.trim()){
+      if(empty){ empty.remove(); empty = null; }
+      var row = document.createElement('div');
+      row.className = 'qc-item';
+      row.innerHTML = '<span class="d"></span><span class="tx"></span>';
+      row.querySelector('.tx').textContent = input.value.trim();
+      list.prepend(row);
+      input.value = '';
+      // speed fix 2: cursor stays put — next thought costs zero taps (burst capture)
+      input.focus();
+    }
+  });
+})();
+</script>
+</body>
+</html>

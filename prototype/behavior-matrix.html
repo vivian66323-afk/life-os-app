@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Life OS — Behavior Matrix</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .app { max-width: 1000px; }
+  .bm-head { padding: 4px 4px 0; margin-bottom: 8px; }
+  .bm-title { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; }
+  .bm-sub { font-size: 14px; color: var(--text-2); margin-top: 6px; max-width: 680px; line-height: 1.55; }
+  .bm-sub b { color: var(--text); }
+
+  /* verdict banner — stays honest about sample size */
+  .bm-verdict { margin: 18px 0; border-radius: 14px; padding: 15px 18px; font-size: 14px; line-height: 1.5; border: 1px solid var(--line); }
+  .bm-verdict.hold { background: linear-gradient(160deg, var(--star-soft), transparent 70%), var(--panel-2); }
+  .bm-verdict.signal { background: linear-gradient(160deg, var(--accent-soft), transparent 70%), var(--panel-2); }
+  .bm-verdict .big { font-size: 15px; font-weight: 650; letter-spacing: -0.01em; }
+  .bm-verdict .why { color: var(--text-2); margin-top: 5px; }
+
+  .tbl-wrap { overflow-x: auto; margin-top: 8px; border: 1px solid var(--line); border-radius: 14px; }
+  table { border-collapse: collapse; width: 100%; min-width: 880px; font-size: 12.5px; }
+  th, td { text-align: left; padding: 9px 11px; border-bottom: 1px solid var(--line); vertical-align: top; line-height: 1.4; }
+  th { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); font-weight: 650; background: var(--panel-2); white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+  td.tm { color: var(--text-2); white-space: nowrap; font-weight: 550; }
+  td.th-thought { color: var(--text); font-weight: 500; }
+  .oc { font-weight: 650; font-size: 11px; }
+  .oc.caught { color: var(--ok); } .oc.missed { color: var(--danger); }
+  .u { color: var(--text-3); font-style: italic; }
+  .yn-y { color: var(--ok); } .yn-n { color: var(--danger); } .yn-u { color: var(--text-3); font-style: italic; }
+  tr.is-miss { background: rgba(209,73,91,0.04); }
+
+  /* cause tally */
+  .bm-tally { margin-top: 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 720px){ .bm-tally { grid-template-columns: 1fr; } }
+  .tally-box h3, .log-box h3 { font-size: 12px; font-weight: 650; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); margin-bottom: 12px; }
+  .cause-row { display: flex; align-items: center; gap: 12px; margin-bottom: 9px; font-size: 13px; }
+  .cause-row .lbl { flex: none; width: 150px; color: var(--text-2); }
+  .cause-row .bar { flex: 1; height: 8px; border-radius: 999px; background: var(--panel-2); overflow: hidden; }
+  .cause-row .bar span { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+  .cause-row .n { flex: none; width: 26px; text-align: right; color: var(--text); font-weight: 600; }
+
+  /* log form */
+  .log-box { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; box-shadow: var(--shadow); }
+  .fld { margin-bottom: 14px; }
+  .fld > label { display: block; font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 7px; }
+  .row2 { display: flex; gap: 10px; }
+  .row2 input { flex: 1; }
+  input[type=text] { width: 100%; font-family: inherit; font-size: 14px; color: var(--text); background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; outline: none; }
+  input[type=text]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { font-family: inherit; font-size: 12px; color: var(--text-2); background: var(--panel-2); border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; cursor: pointer; transition: all .15s; }
+  .chip:hover { border-color: var(--line-2); }
+  .chip.sel { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .log-btn { width: 100%; margin-top: 4px; font-family: inherit; font-size: 14px; font-weight: 600; color: #fff; background: var(--accent); border: none; border-radius: 11px; padding: 12px; cursor: pointer; transition: opacity .2s, transform .1s; }
+  .log-btn:hover { opacity: .92; } .log-btn:active { transform: scale(.99); }
+  .log-note { font-size: 11.5px; color: var(--text-3); margin-top: 10px; line-height: 1.5; }
+  .clear-link { background: none; border: none; color: var(--text-3); font-size: 11.5px; cursor: pointer; text-decoration: underline; font-family: inherit; padding: 0; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand"><span class="mark"></span>Life OS</div>
+    <div class="toolbar">
+      <nav class="levelnav"><a href="index.html">← Hub</a><a href="capture-stress.html">Stress test</a></nav>
+      <button class="iconbtn" id="theme" title="Toggle light / dark">☾</button>
+    </div>
+  </div>
+
+  <div class="bm-head">
+    <div class="bm-title">Behavior Matrix — why thoughts don't survive</div>
+    <div class="bm-sub">We are not choosing an entry surface. We are finding out <b>why a thought is lost</b>. "Didn't open the app" has at least five causes, and each needs a different fix. This instrument classifies <b>real</b> misses only — log each one as it happens, and it stays silent until several point to the same cause.</div>
+  </div>
+
+  <div class="bm-verdict hold" id="verdict"></div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr>
+        <th>Time</th><th>Thought</th><th>Outcome</th><th>Why not opened</th>
+        <th>Secs available</th><th>Hands free</th><th>Eyes free</th><th>Speaking OK</th><th>Would 1 button have saved it?</th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+
+  <div class="bm-tally">
+    <div class="tally-box">
+      <h3>Cause tally (real misses only)</h3>
+      <div id="tally"></div>
+    </div>
+
+    <div class="log-box">
+      <h3>Log a real miss</h3>
+      <div class="fld">
+        <div class="row2">
+          <input type="text" id="f-time" placeholder="Time (e.g. 11:30)">
+          <input type="text" id="f-thought" placeholder="The lost thought…">
+        </div>
+      </div>
+      <div class="fld"><label>Why wasn't the app opened?</label>
+        <div class="chips" data-group="why">
+          <button class="chip" data-v="Activation cost too high">Cost too high</button>
+          <button class="chip" data-v="Thought vanished">Thought vanished</button>
+          <button class="chip" data-v="Hands occupied">Hands occupied</button>
+          <button class="chip" data-v="Socially awkward">Socially awkward</button>
+          <button class="chip" data-v="Not worth interrupting">Not worth it</button>
+          <button class="chip" data-v="Unknown">Unknown</button>
+        </div>
+      </div>
+      <div class="fld"><label>Seconds the thought was available</label>
+        <div class="chips" data-group="secs">
+          <button class="chip" data-v="&lt;2s">&lt;2s</button>
+          <button class="chip" data-v="2–5s">2–5s</button>
+          <button class="chip" data-v="5–15s">5–15s</button>
+          <button class="chip" data-v="&gt;15s">&gt;15s</button>
+          <button class="chip" data-v="Unknown">Unknown</button>
+        </div>
+      </div>
+      <div class="fld"><label>Hands free? · Eyes free? · Speaking acceptable?</label>
+        <div class="chips" data-group="hands"><button class="chip" data-v="Yes">Hands: Yes</button><button class="chip" data-v="No">Hands: No</button><button class="chip" data-v="Unknown">Hands: ?</button></div>
+        <div class="chips" data-group="eyes" style="margin-top:6px"><button class="chip" data-v="Yes">Eyes: Yes</button><button class="chip" data-v="No">Eyes: No</button><button class="chip" data-v="Unknown">Eyes: ?</button></div>
+        <div class="chips" data-group="talk" style="margin-top:6px"><button class="chip" data-v="Yes">Speak: Yes</button><button class="chip" data-v="No">Speak: No</button><button class="chip" data-v="Unknown">Speak: ?</button></div>
+      </div>
+      <div class="fld"><label>Would a single physical button have saved it?</label>
+        <div class="chips" data-group="button">
+          <button class="chip" data-v="Yes">Yes</button>
+          <button class="chip" data-v="No">No</button>
+          <button class="chip" data-v="Maybe / can't tell">Maybe / can't tell</button>
+        </div>
+      </div>
+      <button class="log-btn" id="logBtn">Log this miss</button>
+      <div class="log-note">Stored locally in this browser only. Log misses <b>as they happen</b> — recalled-later data is already corrupted by hindsight. <button class="clear-link" id="clearBtn">clear my logged misses</button></div>
+    </div>
+  </div>
+</div>
+
+<script src="theme.js"></script>
+<script>
+(function(){
+  // --- seed = the ONLY real field data so far (3 events). Unknowns are honest, not filled. ---
+  var SEED = [
+    { time:"08:14", thought:"Bathroom top → black tile", outcome:"caught", why:"—", secs:"~4s (typed)", hands:"Unknown", eyes:"Unknown", talk:"Unknown", button:"—", seed:true },
+    { time:"11:30", thought:"Call the carpenter", outcome:"missed", why:"懶得打開 — cost / not worth it (ambiguous)", secs:"Unknown", hands:"Unknown", eyes:"Unknown", talk:"Unknown", button:"Maybe / can't tell", seed:true },
+    { time:"15:20", thought:"Mr. Lin wants to change the light", outcome:"caught", why:"—", secs:"~3s (typed)", hands:"Unknown", eyes:"Unknown", talk:"Unknown", button:"—", seed:true }
+  ];
+  var KEY = "los_behavior_misses";
+  function load(){ try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch(e){ return []; } }
+  function save(a){ try { localStorage.setItem(KEY, JSON.stringify(a)); } catch(e){} }
+
+  var rowsEl = document.getElementById('rows');
+  var tallyEl = document.getElementById('tally');
+  var verdictEl = document.getElementById('verdict');
+
+  function yn(v){ if(v==="Yes") return '<span class="yn-y">Yes</span>'; if(v==="No") return '<span class="yn-n">No</span>'; if(v==="Unknown"||v==="—") return '<span class="yn-u">'+(v==="—"?"—":"?")+'</span>'; return v; }
+  function cell(v){ return (v==="Unknown") ? '<span class="u">?</span>' : (v||'<span class="u">?</span>'); }
+
+  function render(){
+    var logged = load();
+    var all = SEED.concat(logged);
+    rowsEl.innerHTML = all.map(function(r){
+      var miss = r.outcome === "missed";
+      return '<tr class="'+(miss?'is-miss':'')+'">'
+        + '<td class="tm">'+r.time+'</td>'
+        + '<td class="th-thought">'+r.thought+'</td>'
+        + '<td><span class="oc '+r.outcome+'">'+(miss?'MISSED':'caught')+'</span></td>'
+        + '<td>'+cell(r.why)+'</td>'
+        + '<td>'+cell(r.secs)+'</td>'
+        + '<td>'+yn(r.hands)+'</td>'
+        + '<td>'+yn(r.eyes)+'</td>'
+        + '<td>'+yn(r.talk)+'</td>'
+        + '<td>'+cell(r.button)+'</td>'
+        + '</tr>';
+    }).join('');
+
+    // tally over MISSES only
+    var misses = all.filter(function(r){ return r.outcome === "missed"; });
+    var byCause = {};
+    misses.forEach(function(r){ var c = r.whyClass || r.why || "Unknown"; byCause[c] = (byCause[c]||0)+1; });
+    var causes = Object.keys(byCause).sort(function(a,b){ return byCause[b]-byCause[a]; });
+    var maxN = misses.length || 1;
+    tallyEl.innerHTML = causes.length ? causes.map(function(c){
+      var n = byCause[c];
+      return '<div class="cause-row"><span class="lbl">'+c+'</span><span class="bar"><span style="width:'+(n/maxN*100)+'%"></span></span><span class="n">'+n+'</span></div>';
+    }).join('') : '<div class="log-note">No misses logged yet.</div>';
+
+    // verdict — refuse to conclude on thin data
+    var N = misses.length;
+    var top = causes[0], topN = top ? byCause[top] : 0;
+    var THRESH = 5;
+    if(N < THRESH || !top || topN/N < 0.6 || top === "Unknown"){
+      verdictEl.className = "bm-verdict hold";
+      verdictEl.innerHTML = '<div class="big">Hold — not enough to commit. '+N+' real miss'+(N===1?'':'es')+' logged.</div>'
+        + '<div class="why">Need about '+THRESH+' real misses converging (≥60%) on one cause before choosing any entry surface.'
+        + (top && top!=="Unknown" ? ' Leading so far: <b>'+top+'</b> ('+topN+'/'+N+') — not yet decisive.' : ' Right now most dimensions are still unrecorded.')
+        + '</div>';
+    } else {
+      verdictEl.className = "bm-verdict signal";
+      verdictEl.innerHTML = '<div class="big">Signal: “'+top+'” dominates ('+topN+'/'+N+' misses).</div>'
+        + '<div class="why">Now — and only now — pick the entry surface that removes <b>'+top+'</b>. Not before.</div>';
+    }
+  }
+
+  // form
+  var picks = {};
+  document.querySelectorAll('.chips').forEach(function(g){
+    g.addEventListener('click', function(e){
+      var chip = e.target.closest('.chip'); if(!chip) return;
+      var group = g.getAttribute('data-group');
+      g.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('sel'); });
+      chip.classList.add('sel');
+      picks[group] = chip.getAttribute('data-v');
+    });
+  });
+
+  document.getElementById('logBtn').addEventListener('click', function(){
+    var time = document.getElementById('f-time').value.trim() || "—";
+    var thought = document.getElementById('f-thought').value.trim() || "(unrecorded)";
+    var logged = load();
+    logged.push({
+      time: time, thought: thought, outcome: "missed",
+      why: picks.why || "Unknown", whyClass: picks.why || "Unknown",
+      secs: picks.secs || "Unknown",
+      hands: picks.hands || "Unknown", eyes: picks.eyes || "Unknown", talk: picks.talk || "Unknown",
+      button: picks.button || "Maybe / can't tell"
+    });
+    save(logged);
+    document.getElementById('f-time').value = "";
+    document.getElementById('f-thought').value = "";
+    document.querySelectorAll('.chip.sel').forEach(function(c){ c.classList.remove('sel'); });
+    picks = {};
+    render();
+  });
+
+  document.getElementById('clearBtn').addEventListener('click', function(){
+    save([]); render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
